@@ -91,37 +91,36 @@ def convert_to_mp3(audio_file):
 
         print(f"Error: {e}")
 
-
 def Download_Youtube_video():
-
     global download_path
-    if not URL_Youtube.get() or not download_path:
-        result_label.configure(text="Please provide both a URL and a download location.")
+    url = URL_Youtube.get().strip()  # Remove spaces
+
+    if not url or not download_path:
+        result_label.configure(text="⚠ Please provide both a URL and a download location.")
         return
-    if not URL_Youtube.get().startswith("https://www.youtube.com/watch"):
-        result_label.configure(text="Invalid YouTube URL.")
-        return
+
     if not os.path.isdir(download_path):
-        result_label.configure(text="Invalid download path.")
+        result_label.configure(text="❌ Invalid download path.")
         return
 
     try:
-        yt = YouTube(URL_Youtube.get(), on_progress_callback=on_progress, use_po_token=True)
-        # Debugging information
-        print(f"Video Title: {yt.title}")
-        print(f"Video Author: {yt.author}")
-        stream = yt.streams.get_highest_resolution()
-        print(f"Stream details: {stream}")
-        stream.download(output_path=download_path)
-        result_label.configure(text=f"Video downloaded to: {download_path}")
-        messagebox.showinfo("", "Download Completed!")
+        yt = YouTube(url, on_progress_callback=on_progress)  # Removed `use_po_token=True` (not needed)
 
-    except HTTPError as e:
-        result_label.configure(text=f"HTTP error occurred: {e}")
-        print(f"HTTP Error: {e}")
+        # Debugging information
+        print(f"🔹 Video Title: {yt.title}")
+        print(f"🔹 Video Author: {yt.author}")
+
+        stream = yt.streams.get_highest_resolution()
+        print(f"🎥 Stream details: {stream}")
+
+        # Download the video
+        stream.download(output_path=download_path)
+
+        result_label.configure(text=f"✅ Video downloaded to: {download_path}")
+        messagebox.showinfo("Download Complete", f"Video saved to:\n{download_path}")
 
     except Exception as e:
-        result_label.configure(text=f"An error occurred: {e}")
+        result_label.configure(text=f"❌ An error occurred: {str(e)}")
         print(f"Error: {e}")
 
 def download_youtube_playlist():
